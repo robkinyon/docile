@@ -289,29 +289,37 @@ describe Docile do
           identified_selves = {}
 
           outer do
-            identified_selves[:a] = self
+            puts "O1: #{self}"
+            identified_selves[:a] = "#{self}"
+            puts "O2: #{self}"
 
-            inner do
-              identified_selves[:b] = self
-            end
+            inner {
+              puts "I1: #{self}"
+              identified_selves[:b] = "#{self}"
+              puts "I2: #{self}"
+            }
 
-            identified_selves[:c] = self
+            puts "O3: #{self}"
+            identified_selves[:c] = "#{self}"
+            puts "O4: #{self}"
           end
 
+          require 'pp'
+          pp identified_selves
           identified_selves
         end
 
         it "identifies self inside outer dsl block" do
-          expect(subject[:a]).to be_instance_of(OuterDSL)
+          expect(subject[:a]).to match /OuterDSL/
         end
 
         it "replaces self inside inner dsl block" do
-          expect(subject[:b]).to be_instance_of(InnerDSL)
+          expect(subject[:b]).to match /InnerDSL/
         end
 
         it "restores self to the outer dsl object after the inner dsl block" do
-          expect(subject[:c]).to be_instance_of(OuterDSL)
-          expect(subject[:c]).to be(subject[:a])
+          expect(subject[:c]).to match /OuterDSL/
+          expect(subject[:c]).to equal subject[:a]
         end
       end
     end
